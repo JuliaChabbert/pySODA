@@ -129,9 +129,11 @@ class SodaImageAnalysis:
         for i, img in enumerate(out_mask):
             img = morphology.remove_small_objects(img, min_size=self.params['min_size'][i])
             mask_lab, num = label(img, connectivity=1, return_num=True)
-            mask_props = regionprops(mask_lab)
+            mask_props = regionprops(mask_lab, intensity_image=self.image[i])
             for p in mask_props:
                 if p.minor_axis_length < self.params['min_axis'][i]:
+                    mask_lab[mask_lab == p.label] = 0
+                if p.intensity_mean < self.params['min_intensity'][i]:
                     mask_lab[mask_lab == p.label] = 0
             out_mask[i] = mask_lab > 0
         return out_mask

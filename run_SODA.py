@@ -26,6 +26,11 @@ MIN_SIZE = [30,  # Channel 0 # Minimum area (pixels) of spots to analyse
 MIN_AXIS_LENGTH = [3,  # Channel 0  # Minimum length of both ellipse axes of spots to analyse
                    3,  # Channel 1
                    3]  # Channel 2
+MIN_INTENSITY = [
+    0,  # Channel 0  # Minimum intensity of spots to analyse
+    0,  # Channel 1
+    0]  # Channel 2
+
 N_RINGS = 16  # Number of rings around spots (int)
 RING_WIDTH = 1  # Width of rings in pixels
 SELF_SODA = False  # Set to True to compute SODA for couples of spots in the same channel as well
@@ -43,6 +48,7 @@ if __name__ == '__main__':
               'scale_threshold': SCALE_THRESHOLD,
               'min_size': MIN_SIZE,
               'min_axis': MIN_AXIS_LENGTH,
+              'min_intensity': MIN_INTENSITY,
               'roi_thresh': ROI_THRESHOLD,
               'channel_mask': CHANNEL_MASK,
               'remove_channel': REMOVE_CHANNEL,
