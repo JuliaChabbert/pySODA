@@ -133,7 +133,7 @@ class SodaImageAnalysis:
             for p in mask_props:
                 if p.minor_axis_length < self.params['min_axis'][i]:
                     mask_lab[mask_lab == p.label] = 0
-                if p.mean_intensity < self.params['min_intensity'][i]:
+                if p.intensity_mean < self.params['min_intensity'][i]:
                     mask_lab[mask_lab == p.label] = 0
             out_mask[i] = mask_lab > 0
         return out_mask
