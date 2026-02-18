@@ -129,9 +129,11 @@ class SodaImageAnalysis:
         for i, img in enumerate(out_mask):
             img = morphology.remove_small_objects(img, min_size=self.params['min_size'][i])
             mask_lab, num = label(img, connectivity=1, return_num=True)
-            mask_props = regionprops(mask_lab)
+            mask_props = regionprops(mask_lab, intensity_image=self.image[i])
             for p in mask_props:
                 if p.minor_axis_length < self.params['min_axis'][i]:
+                    mask_lab[mask_lab == p.label] = 0
+                if p.intensity_mean < self.params['min_intensity'][i]:
                     mask_lab[mask_lab == p.label] = 0
             out_mask[i] = mask_lab > 0
         return out_mask
@@ -208,14 +210,19 @@ class SodaImageAnalysis:
         return SR, prob_write, results_dict
 
     def write_prob_histogram(self, probs, ch0, ch1):
-        dists = [i * self.params['ring_width'] for i in range(self.params['n_rings'])]
+        pixel_size = 30  # nm per pixel
+        # Convert ring width and distances to nm
+        ring_width_nm = self.params['ring_width'] * pixel_size
+        dists = [i * ring_width_nm for i in range(self.params['n_rings'])]
         plt.ylim(0, 1.0)
-        plt.bar(dists, probs, align='edge', width=self.params['ring_width'], edgecolor='black', linewidth=0.75)
+        plt.bar(dists, probs, align='edge', width=ring_width_nm, edgecolor='black', linewidth=0.75)
         plt.locator_params(axis='x', nbins=self.params['n_rings'])
-        plt.xlabel('Distance (pixels)')
+        plt.xlabel('Distance (nm)')
         plt.ylabel('Coupling probability')
-        plt.savefig(os.path.join(self.output_dir, 'hist_{}_ch{}{}.pdf'.format(os.path.basename(self.file), ch0, ch1)),
-                    bbox_inches='tight', transparent=True, dpi=600)
+        plt.savefig(
+            os.path.join(self.output_dir, 'hist_{}_ch{}{}.pdf'.format(os.path.basename(self.file), ch0, ch1)),
+            bbox_inches='tight', transparent=True, dpi=600
+        )
         plt.close()
 
     def soda_analysis(self):
